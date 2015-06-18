@@ -1,6 +1,8 @@
 from __future__ import print_function, division
 from modular_device import ModularDevices
 import time
+import yaml
+
 
 DEBUG = True
 BAUDRATE = 9600
@@ -38,17 +40,27 @@ class KaiyuOdorRig(object):
         self.ami = dev_dict[dev_dict.keys()[0]]
         self._debug_print('Found ' + modular_device_name + ' on port ' + str(self.ami.get_port()))
 
-    def run(self):
+    def setup_mfcs(self,mfc_settings_file_path):
+        mfc_settings_stream = open(mfc_settings_file_path, 'r')
+        mfc_settings = yaml.load(mfc_settings_stream)
+        flow_settings = [mfc_settings['mfc_setting_0'],mfc_settings['mfc_setting_1'],0]
         self.psc.set_all_channels_off()
         self._debug_print('set_all_channels_off()')
-        self.ami.set_mfc_flows([10,10,10])
-        self._debug_print('set_mfc_flows([10,10,10])')
-        time.sleep(10)
-        self.psc.set_channels_on([1,3,5])
-        self._debug_print('set_channels_on([1,3,5])')
-        time.sleep(5)
-        self.psc.set_all_channels_off()
-        self._debug_print('set_all_channels_off()')
+        self.ami.set_mfc_flows(flow_settings)
+        self._debug_print('set_mfc_flows(' + str(flow_settings) + ')')
+        self._debug_print('sleeping for ' + str(mfc_settings['sleep_duration']) + 's...')
+        time.sleep(mfc_settings['sleep_duration'])
+
+    def run_protocol(self,protocol_file_path):
+        protocol_stream = open(protocol_file_path, 'r')
+        protocol = yaml.load(protocol_stream)
+        for step in protocol:
+            self.psc.set_channels_on(step['channels_on'])
+            self._debug_print('set_channels_on(' + str(step['channels_on']) + ')')
+            self._debug_print('sleeping for ' + str(step['sleep_duration']) + 's...')
+            time.sleep(step['sleep_duration'])
+            self.psc.set_all_channels_off()
+            self._debug_print('set_all_channels_off()')
 
     def _debug_print(self, *args):
         if self._debug:
