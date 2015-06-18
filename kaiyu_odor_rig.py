@@ -15,7 +15,8 @@ class KaiyuOdorRig(object):
         else:
             kwargs.update({'debug': DEBUG})
             self._debug = DEBUG
-        modular_devices = ModularDevices(try_ports=ports)
+        self._debug_print('Initializing KaiyuOdorRig...')
+        modular_devices = ModularDevices()
 
         modular_device_name = 'power_switch_controller'
         try:
@@ -39,11 +40,15 @@ class KaiyuOdorRig(object):
 
     def run(self):
         self.psc.set_all_channels_off()
+        self._debug_print('set_all_channels_off()')
         self.ami.set_mfc_flows([10,10,10])
+        self._debug_print('set_mfc_flows([10,10,10])')
         time.sleep(10)
         self.psc.set_channels_on([1,3,5])
+        self._debug_print('set_channels_on([1,3,5])')
         time.sleep(5)
         self.psc.set_all_channels_off()
+        self._debug_print('set_all_channels_off()')
 
     def _debug_print(self, *args):
         if self._debug:
