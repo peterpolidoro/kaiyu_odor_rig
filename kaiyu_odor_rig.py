@@ -40,6 +40,8 @@ class KaiyuOdorRig(object):
         self.ami = dev_dict[dev_dict.keys()[0]]
         self._debug_print('Found ' + modular_device_name + ' on port ' + str(self.ami.get_port()))
 
+        self.pulse_duration = 10
+
     def setup_mfcs(self,mfc_settings_file_path):
         mfc_settings_stream = open(mfc_settings_file_path, 'r')
         mfc_settings = yaml.load(mfc_settings_stream)
@@ -55,6 +57,8 @@ class KaiyuOdorRig(object):
         protocol_stream = open(protocol_file_path, 'r')
         protocol = yaml.load(protocol_stream)
         for step in protocol:
+            self.ami.pulse_bnc_b(self.pulse_duration)
+            self._debug_print('pulse_bnc_b(' + self.pulse_duration + ')')
             self.psc.set_channels_on(step['channels_on'])
             self._debug_print('set_channels_on(' + str(step['channels_on']) + ')')
             self._debug_print('sleeping for ' + str(step['sleep_duration']) + 's...')
