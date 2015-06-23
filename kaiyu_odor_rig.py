@@ -24,9 +24,9 @@ class KaiyuOdorRig(object):
         try:
             dev_dict = modular_devices[modular_device_name]
         except KeyError:
-            raise HybridizerError('Could not find ' + modular_device_name + '. Check connections and permissions.')
+            raise RuntimeError('Could not find ' + modular_device_name + '. Check connections and permissions.')
         if len(dev_dict) > 1:
-            raise HybridizerError('More than one ' + modular_device_name + ' found. Only one should be connected.')
+            raise RuntimeError('More than one ' + modular_device_name + ' found. Only one should be connected.')
         self.psc = dev_dict[dev_dict.keys()[0]]
         self._debug_print('Found ' + modular_device_name + ' on port ' + str(self.psc.get_port()))
 
@@ -34,9 +34,9 @@ class KaiyuOdorRig(object):
         try:
             dev_dict = modular_devices[modular_device_name]
         except KeyError:
-            raise HybridizerError('Could not find ' + modular_device_name + '. Check connections and permissions.')
+            raise RuntimeError('Could not find ' + modular_device_name + '. Check connections and permissions.')
         if len(dev_dict) > 1:
-            raise HybridizerError('More than one ' + modular_device_name + ' found. Only one should be connected.')
+            raise RuntimeError('More than one ' + modular_device_name + ' found. Only one should be connected.')
         self.ami = dev_dict[dev_dict.keys()[0]]
         self._debug_print('Found ' + modular_device_name + ' on port ' + str(self.ami.get_port()))
 
@@ -56,18 +56,22 @@ class KaiyuOdorRig(object):
     def run_protocol(self,protocol_file_path):
         protocol_stream = open(protocol_file_path, 'r')
         protocol = yaml.load(protocol_stream)
+        step_count = 0
         for step in protocol:
+            self._debug_print('running step ' + str(step_count))
             self.ami.pulse_bnc_b(self.pulse_duration)
-            self._debug_print('pulse_bnc_b(' + self.pulse_duration + ')')
+            self._debug_print('pulse_bnc_b(' + str(self.pulse_duration) + ')')
             self.psc.set_channels_on(step['channels_on'])
             self._debug_print('set_channels_on(' + str(step['channels_on']) + ')')
-            self._debug_print('sleeping for ' + str(step['sleep_duration']) + 's...')
+            self._debug_print('sleeping for ' + str(step['sleep_duration_on']) + 's...')
             time.sleep(step['sleep_duration_on'])
             self._debug_print('set_channels_off()')
             self.psc.set_all_channels_off()
             self._debug_print('set_all_channels_off()')
-            self._debug_print('sleeping for ' + str(step['sleep_duration']) + 's...')
+            self._debug_print('sleeping for ' + str(step['sleep_duration_off']) + 's...')
             time.sleep(step['sleep_duration_off'])
+            self._debug_print('')
+            step_count += 1
 
     def _debug_print(self, *args):
         if self._debug:
