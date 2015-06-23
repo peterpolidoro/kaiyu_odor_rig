@@ -58,9 +58,12 @@ class KaiyuOdorRig(object):
             self.psc.set_channels_on(step['channels_on'])
             self._debug_print('set_channels_on(' + str(step['channels_on']) + ')')
             self._debug_print('sleeping for ' + str(step['sleep_duration']) + 's...')
-            time.sleep(step['sleep_duration'])
+            time.sleep(step['sleep_duration_on'])
+            self._debug_print('set_channels_off()')
             self.psc.set_all_channels_off()
             self._debug_print('set_all_channels_off()')
+            self._debug_print('sleeping for ' + str(step['sleep_duration']) + 's...')
+            time.sleep(step['sleep_duration_off'])
 
     def _debug_print(self, *args):
         if self._debug:

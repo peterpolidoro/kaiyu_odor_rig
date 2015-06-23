@@ -1,12 +1,17 @@
 - channels_on:
   - 1
   - 2
-  sleep_duration: 5
+  - 3
+  - 4
+  sleep_duration_on: 5
+  sleep_duration_off: 5
 - channels_on:
   - 3
   - 4
-  sleep_duration: 10
+  sleep_duration_on: 5
+  sleep_duration_off: 5
 - channels_on:
   - 3
   - 4
-  sleep_duration: 10
+  sleep_duration_on: 5
+  sleep_duration_off: 5
